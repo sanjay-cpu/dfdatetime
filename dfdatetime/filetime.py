@@ -43,9 +43,6 @@ class Filetime(interface.DateTimeValues):
                    of day, seconds fraction and timezone offset are optional.
                    The default timezone is UTC.
 
-    Returns:
-      An integer containing the timestamp.
-
     Raises:
       ValueError: if the time string is invalid or not supported.
     """
@@ -79,7 +76,7 @@ class Filetime(interface.DateTimeValues):
     self.timestamp *= 10
 
   def CopyToStatTimeTuple(self):
-    """Copies the timestamp to a stat timestamp tuple.
+    """Copies the FILETIME timestamp to a stat timestamp tuple.
 
     Returns:
       A tuple of an integer containing a POSIX timestamp in seconds
@@ -94,3 +91,19 @@ class Filetime(interface.DateTimeValues):
     if timestamp > self._INT64_MAX:
       return None, None
     return timestamp, remainder
+
+  def GetPlasoTimestamp(self):
+    """Retrieves a timestamp that is compatible with plaso.
+
+    Returns:
+      An integer containing a POSIX timestamp in microseconds or
+      None on error.
+    """
+    if self.timestamp < 0:
+      return
+
+    timestamp, _ = divmod(self.timestamp, 10)
+    timestamp -= self._FILETIME_TO_POSIX_BASE * 1000000
+    if timestamp > self._INT64_MAX:
+      return
+    return timestamp

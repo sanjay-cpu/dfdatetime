@@ -18,6 +18,14 @@ class PosixTimeTest(unittest.TestCase):
     stat_time_tuple = posix_time_object.CopyToStatTimeTuple()
     self.assertEqual(stat_time_tuple, expected_stat_time_tuple)
 
+  def testGetPlasoTimestamp(self):
+    """Tests the GetPlasoTimestamp function."""
+    posix_time_object = posix_time.PosixTime(1281643591, micro_seconds=546875)
+
+    expected_micro_posix_timestamp = 1281643591546875
+    micro_posix_timestamp = posix_time_object.GetPlasoTimestamp()
+    self.assertEqual(micro_posix_timestamp, expected_micro_posix_timestamp)
+
 
 if __name__ == '__main__':
   unittest.main()
