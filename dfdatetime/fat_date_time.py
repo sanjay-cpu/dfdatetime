@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 """FAT date time implementation."""
 
+import calendar
+
+from dfdatetime import definitions
 from dfdatetime import interface
 
 
@@ -21,6 +24,11 @@ class FATDateTime(interface.DateTimeValues):
 
   The FAT date time has no time zone information and is typically stored
   in the local time of the computer.
+
+  Attributes:
+    precision (str): precision of the date and time value, which should
+        be one of the PRECISION_VALUES in definitions.
+    time_zone (str): time zone the date and time values are in.
   """
 
   # The difference between Jan 1, 1980 and Jan 1, 1970 in seconds.
@@ -32,8 +40,13 @@ class FATDateTime(interface.DateTimeValues):
     Args:
       fat_date_time (Optional[int]): FAT date time.
     """
+    number_of_seconds = None
+    if fat_date_time is not None:
+      number_of_seconds = self._GetNumberOfSeconds(fat_date_time)
+
     super(FATDateTime, self).__init__()
-    self._number_of_seconds = self._GetNumberOfSeconds(fat_date_time)
+    self._number_of_seconds = number_of_seconds
+    self.precision = definitions.PRECISION_2_SECONDS
 
   def _GetNumberOfSeconds(self, fat_date_time):
     """Retrieves the number of seconds from a FAT date time.
@@ -88,17 +101,31 @@ class FATDateTime(interface.DateTimeValues):
 
           Where # are numeric digits ranging from 0 to 9 and the seconds
           fraction can be either 3 or 6 digits. The time of day, seconds
-          fraction and timezone offset are optional. The default timezone
+          fraction and time zone offset are optional. The default time zone
           is UTC.
 
     Raises:
       ValueError: if the time string is invalid or not supported.
     """
-    if not time_string:
-      raise ValueError(u'Invalid time string.')
+    date_time_values = self._CopyDateTimeFromString(time_string)
 
-    # TODO: implement.
-    raise NotImplementedError()
+    year = date_time_values.get(u'year', 0)
+    month = date_time_values.get(u'month', 0)
+    day_of_month = date_time_values.get(u'day_of_month', 0)
+    hours = date_time_values.get(u'hours', 0)
+    minutes = date_time_values.get(u'minutes', 0)
+    seconds = date_time_values.get(u'seconds', 0)
+
+    if year < 1980 or year > (1980 + 0x7f):
+      raise ValueError(u'Year value not supported: {0!s}.'.format(year))
+
+    time_tuple = (year, month, day_of_month, hours, minutes, seconds)
+    timestamp = calendar.timegm(time_tuple)
+    timestamp = int(timestamp)
+
+    self._number_of_seconds = timestamp - self._FAT_DATE_TO_POSIX_BASE
+
+    self.time_zone = u'UTC'
 
   def CopyToStatTimeTuple(self):
     """Copies the FAT date time to a stat timestamp tuple.
@@ -107,11 +134,11 @@ class FATDateTime(interface.DateTimeValues):
       tuple[int, int]: a POSIX timestamp in seconds and the remainder in
           100 nano seconds or (None, None) on error.
     """
-    if self._number_of_seconds < 0:
+    if self._number_of_seconds is None or self._number_of_seconds < 0:
       return None, None
 
     timestamp = self._number_of_seconds + self._FAT_DATE_TO_POSIX_BASE
-    return timestamp, 0
+    return timestamp, None
 
   def GetPlasoTimestamp(self):
     """Retrieves a timestamp that is compatible with plaso.
@@ -119,7 +146,7 @@ class FATDateTime(interface.DateTimeValues):
     Returns:
       int: a POSIX timestamp in microseconds or None on error.
     """
-    if self._number_of_seconds < 0:
+    if self._number_of_seconds is None or self._number_of_seconds < 0:
       return
 
     return (self._number_of_seconds + self._FAT_DATE_TO_POSIX_BASE) * 1000000

@@ -3,6 +3,7 @@
 
 import calendar
 
+from dfdatetime import definitions
 from dfdatetime import interface
 
 
@@ -16,12 +17,15 @@ class Filetime(interface.DateTimeValues):
   2 x 32-bit integers and is presumed to be unsigned.
 
   Attributes:
+    precision (str): precision of the date and time value, which should
+        be one of the PRECISION_VALUES in definitions.
     timestamp (int): FILETIME timestamp.
+    time_zone (str): time zone the date and time values are in.
   """
 
   # The difference between Jan 1, 1601 and Jan 1, 1970 in seconds.
   _FILETIME_TO_POSIX_BASE = 11644473600
-  _INT64_MAX = (1 << 63) - 1
+  _UINT64_MAX = (1 << 64) - 1
 
   def __init__(self, timestamp=None):
     """Initializes a FILETIME object.
@@ -30,6 +34,7 @@ class Filetime(interface.DateTimeValues):
       timestamp (Optional[int]): FILETIME timestamp.
     """
     super(Filetime, self).__init__()
+    self.precision = definitions.PRECISION_100_NANOSECONDS
     self.timestamp = timestamp
 
   def CopyFromString(self, time_string):
@@ -41,41 +46,34 @@ class Filetime(interface.DateTimeValues):
 
           Where # are numeric digits ranging from 0 to 9 and the seconds
           fraction can be either 3 or 6 digits. The time of day, seconds
-          fraction and timezone offset are optional. The default timezone
+          fraction and time zone offset are optional. The default time zone
           is UTC.
 
     Raises:
       ValueError: if the time string is invalid or not supported.
     """
-    if not time_string:
-      raise ValueError(u'Invalid time string.')
+    date_time_values = self._CopyDateTimeFromString(time_string)
 
-    time_string_length = len(time_string)
+    year = date_time_values.get(u'year', 0)
+    month = date_time_values.get(u'month', 0)
+    day_of_month = date_time_values.get(u'day_of_month', 0)
+    hours = date_time_values.get(u'hours', 0)
+    minutes = date_time_values.get(u'minutes', 0)
+    seconds = date_time_values.get(u'seconds', 0)
 
-    year, month, day_of_month = self._CopyDateFromString(time_string)
-
-    hours = 0
-    minutes = 0
-    seconds = 0
-    micro_seconds = 0
-    timezone_offset = 0
-
-    if time_string_length > 10:
-      # If a time of day is specified the time string it should at least
-      # contain 'YYYY-MM-DD hh:mm:ss'.
-      if time_string[10] != u' ':
-        raise ValueError(u'Invalid time string.')
-
-      hours, minutes, seconds, micro_seconds, timezone_offset = (
-          self._CopyTimeFromString(time_string[11:]))
+    if year < 1601:
+      raise ValueError(u'Year value not supported: {0!s}.'.format(year))
 
     time_tuple = (year, month, day_of_month, hours, minutes, seconds)
     self.timestamp = calendar.timegm(time_tuple)
     self.timestamp = int(self.timestamp)
 
-    self.timestamp += timezone_offset + self._FILETIME_TO_POSIX_BASE
-    self.timestamp = (self.timestamp * 1000000) + micro_seconds
+    self.timestamp += self._FILETIME_TO_POSIX_BASE
+    self.timestamp *= 1000000
+    self.timestamp += date_time_values.get(u'microseconds', 0)
     self.timestamp *= 10
+
+    self.time_zone = u'UTC'
 
   def CopyToStatTimeTuple(self):
     """Copies the FILETIME timestamp to a stat timestamp tuple.
@@ -84,13 +82,12 @@ class Filetime(interface.DateTimeValues):
       tuple[int, int]: a POSIX timestamp in seconds and the remainder in
           100 nano seconds or (None, None) on error.
     """
-    if self.timestamp < 0:
+    if (self.timestamp is None or self.timestamp < 0 or
+        self.timestamp > self._UINT64_MAX):
       return None, None
 
     timestamp, remainder = divmod(self.timestamp, 10000000)
     timestamp -= self._FILETIME_TO_POSIX_BASE
-    if timestamp > self._INT64_MAX:
-      return None, None
     return timestamp, remainder
 
   def GetPlasoTimestamp(self):
@@ -99,11 +96,9 @@ class Filetime(interface.DateTimeValues):
     Returns:
       int: a POSIX timestamp in microseconds or None on error.
     """
-    if self.timestamp < 0:
+    if (self.timestamp is None or self.timestamp < 0 or
+        self.timestamp > self._UINT64_MAX):
       return
 
     timestamp, _ = divmod(self.timestamp, 10)
-    timestamp -= self._FILETIME_TO_POSIX_BASE * 1000000
-    if timestamp > self._INT64_MAX:
-      return
-    return timestamp
+    return timestamp - (self._FILETIME_TO_POSIX_BASE * 1000000)
