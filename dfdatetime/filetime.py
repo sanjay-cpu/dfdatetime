@@ -17,10 +17,10 @@ class Filetime(interface.DateTimeValues):
   2 x 32-bit integers and is presumed to be unsigned.
 
   Attributes:
+    is_local_time (bool): True if the date and time value is in local time.
     precision (str): precision of the date and time value, which should
         be one of the PRECISION_VALUES in definitions.
     timestamp (int): FILETIME timestamp.
-    time_zone (str): time zone the date and time values are in.
   """
 
   # The difference between Jan 1, 1601 and Jan 1, 1970 in seconds.
@@ -28,7 +28,7 @@ class Filetime(interface.DateTimeValues):
   _UINT64_MAX = (1 << 64) - 1
 
   def __init__(self, timestamp=None):
-    """Initializes a FILETIME object.
+    """Initializes a FILETIME timestamp.
 
     Args:
       timestamp (Optional[int]): FILETIME timestamp.
@@ -73,7 +73,7 @@ class Filetime(interface.DateTimeValues):
     self.timestamp += date_time_values.get(u'microseconds', 0)
     self.timestamp *= 10
 
-    self.time_zone = u'UTC'
+    self.is_local_time = False
 
   def CopyToStatTimeTuple(self):
     """Copies the FILETIME timestamp to a stat timestamp tuple.

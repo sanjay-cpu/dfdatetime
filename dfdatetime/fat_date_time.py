@@ -14,8 +14,8 @@ class FATDateTime(interface.DateTimeValues):
 
   The FAT date and time is a 32-bit value containing two 16-bit values:
     * The date (lower 16-bit).
-      * bits 0 - 4:  day of month, where 1 represents the first day
-      * bits 5 - 8:  month of year, where 1 represent January
+      * bits 0 - 4: day of month, where 1 represents the first day
+      * bits 5 - 8: month of year, where 1 represent January
       * bits 9 - 15: year since 1980
     * The time of day (upper 16-bit).
       * bits 0 - 4: seconds (in 2 second intervals)
@@ -26,16 +26,16 @@ class FATDateTime(interface.DateTimeValues):
   in the local time of the computer.
 
   Attributes:
+    is_local_time (bool): True if the date and time value is in local time.
     precision (str): precision of the date and time value, which should
         be one of the PRECISION_VALUES in definitions.
-    time_zone (str): time zone the date and time values are in.
   """
 
   # The difference between Jan 1, 1980 and Jan 1, 1970 in seconds.
   _FAT_DATE_TO_POSIX_BASE = 315532800
 
   def __init__(self, fat_date_time=None):
-    """Initializes a FAT date time object.
+    """Initializes a FAT date time.
 
     Args:
       fat_date_time (Optional[int]): FAT date time.
@@ -70,6 +70,7 @@ class FATDateTime(interface.DateTimeValues):
       raise ValueError(u'Day of month value out of bounds.')
 
     number_of_days = self._GetDayOfYear(1980 + year, month, day_of_month)
+    number_of_days -= 1
     for past_year in range(0, year):
       number_of_days += self._GetNumberOfDaysInYear(past_year)
 
@@ -125,7 +126,7 @@ class FATDateTime(interface.DateTimeValues):
 
     self._number_of_seconds = timestamp - self._FAT_DATE_TO_POSIX_BASE
 
-    self.time_zone = u'UTC'
+    self.is_local_time = False
 
   def CopyToStatTimeTuple(self):
     """Copies the FAT date time to a stat timestamp tuple.
