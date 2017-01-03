@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """Time elements implementation."""
 
-import calendar
-
 from dfdatetime import definitions
 from dfdatetime import interface
 
@@ -36,9 +34,11 @@ class TimeElements(interface.DateTimeValues):
     self.precision = definitions.PRECISION_1_SECOND
 
     if time_elements_tuple:
-      # Using calendar.timegm here since we want it to raise ValueError
-      # on error.
-      self._number_of_seconds = calendar.timegm(time_elements_tuple)
+      if len(time_elements_tuple) < 6:
+        raise ValueError(u'Invalid time elements tuple 6 elements required.')
+
+      self._number_of_seconds = self._GetNumberOfSecondsFromElements(
+          *time_elements_tuple)
 
   def CopyFromString(self, time_string):
     """Copies time elements from a string containing a date and time value.
@@ -61,9 +61,9 @@ class TimeElements(interface.DateTimeValues):
     minutes = date_time_values.get(u'minutes', 0)
     seconds = date_time_values.get(u'seconds', 0)
 
-    self._time_elements_tuple = (
-        year, month, day_of_month, hours, minutes, seconds)
     self._number_of_seconds = self._GetNumberOfSecondsFromElements(
+        year, month, day_of_month, hours, minutes, seconds)
+    self._time_elements_tuple = (
         year, month, day_of_month, hours, minutes, seconds)
 
     self.is_local_time = False
@@ -111,6 +111,61 @@ class TimeElements(interface.DateTimeValues):
 
     self.CopyFromString(time_string)
 
+  def CopyFromStringTuple(self, time_elements_tuple):
+    """Copies time elements from string-based time elements tuple.
+
+    Args:
+      time_elements_tuple (Optional[tuple[str, str, str, str, str, str]]):
+          time elements, contains year, month, day of month, hours, minutes and
+          seconds.
+
+    Raises:
+      ValueError: if the time elements tuple is invalid.
+    """
+    if len(time_elements_tuple) < 6:
+      raise ValueError(u'Invalid time elements tuple 6 elements required.')
+
+    try:
+      year = int(time_elements_tuple[0], 10)
+    except (TypeError, ValueError):
+      raise ValueError(u'Invalid year value: {0!s}'.format(
+          time_elements_tuple[0]))
+
+    try:
+      month = int(time_elements_tuple[1], 10)
+    except (TypeError, ValueError):
+      raise ValueError(u'Invalid month value: {0!s}'.format(
+          time_elements_tuple[1]))
+
+    try:
+      day_of_month = int(time_elements_tuple[2], 10)
+    except (TypeError, ValueError):
+      raise ValueError(u'Invalid day of month value: {0!s}'.format(
+          time_elements_tuple[2]))
+
+    try:
+      hours = int(time_elements_tuple[3], 10)
+    except (TypeError, ValueError):
+      raise ValueError(u'Invalid hours value: {0!s}'.format(
+          time_elements_tuple[3]))
+
+    try:
+      minutes = int(time_elements_tuple[4], 10)
+    except (TypeError, ValueError):
+      raise ValueError(u'Invalid minutes value: {0!s}'.format(
+          time_elements_tuple[4]))
+
+    try:
+      seconds = int(time_elements_tuple[5], 10)
+    except (TypeError, ValueError):
+      raise ValueError(u'Invalid seconds value: {0!s}'.format(
+          time_elements_tuple[5]))
+
+    self._number_of_seconds = self._GetNumberOfSecondsFromElements(
+        year, month, day_of_month, hours, minutes, seconds)
+    self._time_elements_tuple = (
+        year, month, day_of_month, hours, minutes, seconds)
+
   def CopyToStatTimeTuple(self):
     """Copies the time elements to a stat timestamp tuple.
 
@@ -155,6 +210,9 @@ class TimeElementsInMilliseconds(TimeElements):
     """
     milliseconds = None
     if time_elements_tuple:
+      if len(time_elements_tuple) < 7:
+        raise ValueError(u'Invalid time elements tuple 7 elements required.')
+
       milliseconds = time_elements_tuple[6]
       time_elements_tuple = time_elements_tuple[:6]
 
@@ -189,13 +247,35 @@ class TimeElementsInMilliseconds(TimeElements):
     microseconds = date_time_values.get(u'microseconds', 0)
     milliseconds, _ = divmod(microseconds, 1000)
 
-    self._time_elements_tuple = (
-        year, month, day_of_month, hours, minutes, seconds, milliseconds)
     self._number_of_seconds = self._GetNumberOfSecondsFromElements(
         year, month, day_of_month, hours, minutes, seconds)
     self._milliseconds = milliseconds
+    self._time_elements_tuple = (
+        year, month, day_of_month, hours, minutes, seconds, milliseconds)
 
     self.is_local_time = False
+
+  def CopyFromStringTuple(self, time_elements_tuple):
+    """Copies time elements from string-based time elements tuple.
+
+    Args:
+      time_elements_tuple (Optional[tuple[str, str, str, str, str, str, str]]):
+          time elements, contains year, month, day of month, hours, minutes,
+          seconds and milliseconds.
+
+    Raises:
+      ValueError: if the time elements tuple is invalid.
+    """
+    if len(time_elements_tuple) < 7:
+      raise ValueError(u'Invalid time elements tuple 7 elements required.')
+
+    super(TimeElementsInMilliseconds, self).CopyFromStringTuple(
+        time_elements_tuple)
+    try:
+      self._milliseconds = int(time_elements_tuple[6], 10)
+    except (TypeError, ValueError):
+      raise ValueError(u'Invalid milliseconds value: {0!s}'.format(
+          time_elements_tuple[6]))
 
   def CopyToStatTimeTuple(self):
     """Copies the time elements to a stat timestamp tuple.

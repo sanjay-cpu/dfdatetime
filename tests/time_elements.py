@@ -17,9 +17,16 @@ class TimeElementsTest(unittest.TestCase):
     time_elements_object = time_elements.TimeElements()
     self.assertIsNotNone(time_elements_object)
 
+    expected_time_elements_tuple = (2010, 8, 12, 20, 6, 31)
     time_elements_object = time_elements.TimeElements(
         time_elements_tuple=(2010, 8, 12, 20, 6, 31))
     self.assertIsNotNone(time_elements_object)
+    self.assertEqual(
+        time_elements_object._time_elements_tuple, expected_time_elements_tuple)
+
+    with self.assertRaises(ValueError):
+      time_elements.TimeElements(
+          time_elements_tuple=(2010, 8, 12, 20, 6))
 
     with self.assertRaises(ValueError):
       time_elements.TimeElements(
@@ -162,6 +169,45 @@ class TimeElementsTest(unittest.TestCase):
     with self.assertRaises(ValueError):
       time_elements_object.CopyFromStringISO8601(u'2010-08-12T21:06:31.5')
 
+  def testCopyFromStringTuple(self):
+    """Tests the CopyFromStringTuple function."""
+    time_elements_object = time_elements.TimeElements()
+
+    expected_time_elements_tuple = (2010, 8, 12, 20, 6, 31)
+    time_elements_object.CopyFromStringTuple(
+        time_elements_tuple=(u'2010', u'8', u'12', u'20', u'6', u'31'))
+    self.assertIsNotNone(time_elements_object)
+    self.assertEqual(
+        time_elements_object._time_elements_tuple, expected_time_elements_tuple)
+
+    with self.assertRaises(ValueError):
+      time_elements_object.CopyFromStringTuple(
+          time_elements_tuple=(u'2010', u'8', u'12', u'20', u'6'))
+
+    with self.assertRaises(ValueError):
+      time_elements_object.CopyFromStringTuple(
+          time_elements_tuple=(u'20A0', u'B', u'12', u'20', u'6', u'31'))
+
+    with self.assertRaises(ValueError):
+      time_elements_object.CopyFromStringTuple(
+          time_elements_tuple=(u'2010', u'B', u'12', u'20', u'6', u'31'))
+
+    with self.assertRaises(ValueError):
+      time_elements_object.CopyFromStringTuple(
+          time_elements_tuple=(u'2010', u'8', u'1C', u'20', u'6', u'31'))
+
+    with self.assertRaises(ValueError):
+      time_elements_object.CopyFromStringTuple(
+          time_elements_tuple=(u'2010', u'8', u'12', u'D0', u'6', u'31'))
+
+    with self.assertRaises(ValueError):
+      time_elements_object.CopyFromStringTuple(
+          time_elements_tuple=(u'2010', u'8', u'12', u'20', u'E', u'31'))
+
+    with self.assertRaises(ValueError):
+      time_elements_object.CopyFromStringTuple(
+          time_elements_tuple=(u'2010', u'8', u'12', u'20', u'6', u'F1'))
+
   def testCopyToStatTimeTuple(self):
     """Tests the CopyToStatTimeTuple function."""
     time_elements_object = time_elements.TimeElements(
@@ -203,16 +249,20 @@ class TimeElementsInMillisecondsTest(unittest.TestCase):
     time_elements_object = time_elements.TimeElements()
     self.assertIsNotNone(time_elements_object)
 
-    time_elements_object = time_elements.TimeElements(
-        time_elements_tuple=(2010, 8, 12, 20, 6, 31, 864))
+    expected_time_elements_tuple = (2010, 8, 12, 20, 6, 31)
+    time_elements_object = time_elements.TimeElementsInMilliseconds(
+        time_elements_tuple=(2010, 8, 12, 20, 6, 31, 546))
     self.assertIsNotNone(time_elements_object)
+    self.assertEqual(
+        time_elements_object._time_elements_tuple, expected_time_elements_tuple)
+    self.assertEqual(time_elements_object._milliseconds, 546)
 
     with self.assertRaises(ValueError):
-      time_elements.TimeElements(
+      time_elements.TimeElementsInMilliseconds(
           time_elements_tuple=(2010, 13, 12, 20, 6, 31))
 
     with self.assertRaises(ValueError):
-      time_elements.TimeElements(
+      time_elements.TimeElementsInMilliseconds(
           time_elements_tuple=(2010, 13, 12, 20, 6, 31, 1001))
 
   def testCopyFromString(self):
@@ -351,6 +401,26 @@ class TimeElementsInMillisecondsTest(unittest.TestCase):
 
     with self.assertRaises(ValueError):
       time_elements_object.CopyFromStringISO8601(u'2010-08-12T21:06:31.5')
+
+  def testCopyFromStringTuple(self):
+    """Tests the CopyFromStringTuple function."""
+    time_elements_object = time_elements.TimeElementsInMilliseconds()
+
+    expected_time_elements_tuple = (2010, 8, 12, 20, 6, 31)
+    time_elements_object.CopyFromStringTuple(
+        time_elements_tuple=(u'2010', u'8', u'12', u'20', u'6', u'31', u'546'))
+    self.assertIsNotNone(time_elements_object)
+    self.assertEqual(
+        time_elements_object._time_elements_tuple, expected_time_elements_tuple)
+    self.assertEqual(time_elements_object._milliseconds, 546)
+
+    with self.assertRaises(ValueError):
+      time_elements_object.CopyFromStringTuple(
+          time_elements_tuple=(u'2010', u'8', u'12', u'20', u'6', u'31'))
+
+    with self.assertRaises(ValueError):
+      time_elements_object.CopyFromStringTuple(
+          time_elements_tuple=(u'2010', u'8', u'12', u'20', u'6', u'31', u'9S'))
 
   def testCopyToStatTimeTuple(self):
     """Tests the CopyToStatTimeTuple function."""
