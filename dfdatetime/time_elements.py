@@ -6,7 +6,7 @@ from dfdatetime import interface
 
 
 class TimeElements(interface.DateTimeValues):
-  """Class that implements time elements.
+  """Time elements.
 
   Time elements contain separate values for year, month, day of month,
   hours, minutes and seconds.
@@ -41,7 +41,7 @@ class TimeElements(interface.DateTimeValues):
           *time_elements_tuple)
 
   def CopyFromString(self, time_string):
-    """Copies time elements from a string containing a date and time value.
+    """Copies time elements from a date and time string.
 
     Args:
       time_string (str): date and time value formatted as:
@@ -189,7 +189,7 @@ class TimeElements(interface.DateTimeValues):
 
 
 class TimeElementsInMilliseconds(TimeElements):
-  """Class that implements time elements in milliseconds.
+  """Time elements in milliseconds.
 
   Attributes:
     is_local_time (bool): True if the date and time value is in local time.
@@ -225,7 +225,7 @@ class TimeElementsInMilliseconds(TimeElements):
     self.precision = definitions.PRECISION_1_MILLISECOND
 
   def CopyFromString(self, time_string):
-    """Copies time elements from a string containing a date and time value.
+    """Copies time elements from a date and time string.
 
     Args:
       time_string (str): date and time value formatted as:

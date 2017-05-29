@@ -6,7 +6,7 @@ from dfdatetime import interface
 
 
 class CocoaTime(interface.DateTimeValues):
-  """Class that implements a Cocoa timestamp.
+  """Cocoa timestamp.
 
   The Cocoa timestamp is a floating point value that contains the number of
   seconds since 2001-01-01 00:00:00 (also known as the Cocoa epoch).
@@ -36,7 +36,7 @@ class CocoaTime(interface.DateTimeValues):
     self.timestamp = timestamp
 
   def CopyFromString(self, time_string):
-    """Copies a Cocoa timestamp from a string containing a date and time value.
+    """Copies a Cocoa timestamp from a date and time string.
 
     Args:
       time_string (str): date and time value formatted as:

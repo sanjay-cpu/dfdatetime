@@ -5,7 +5,7 @@ from dfdatetime import interface
 
 
 class SemanticTime(interface.DateTimeValues):
-  """Class that implements semantic time.
+  """Semantic time.
 
   Semantic time is term to describe date and time values that have specific
   meaning such as: "Never", "Yesterday", "Not set".
@@ -29,7 +29,7 @@ class SemanticTime(interface.DateTimeValues):
     self.string = string
 
   def CopyFromString(self, time_string):
-    """Copies semantic time from a string containing a date and time value.
+    """Copies semantic time from a date and time string.
 
     Args:
       time_string (str): semantic representation of the time, such as:

@@ -6,7 +6,7 @@ from dfdatetime import interface
 
 
 class Systemtime(interface.DateTimeValues):
-  """Class that implements a SYSTEMTIME structure.
+  """SYSTEMTIME structure.
 
   The SYSTEMTIME structure is 16 bytes of size and contains:
 
@@ -101,7 +101,7 @@ class Systemtime(interface.DateTimeValues):
           self.seconds)
 
   def CopyFromString(self, time_string):
-    """Copies a SYSTEMTIME from a string containing a date and time value.
+    """Copies a SYSTEMTIME structure from a date and time string.
 
     Args:
       time_string (str): date and time value formatted as:
