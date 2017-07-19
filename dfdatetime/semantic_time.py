@@ -58,3 +58,27 @@ class SemanticTime(interface.DateTimeValues):
       int: a POSIX timestamp in microseconds, which will always be 0.
     """
     return 0
+
+
+class InvalidTime(SemanticTime):
+  """Semantic time that represents invalid."""
+
+  def __init__(self):
+    """Initializes a semantic time that represents invalid."""
+    super(InvalidTime, self).__init__(string='Invalid')
+
+
+class Never(SemanticTime):
+  """Semantic time that represents never."""
+
+  def __init__(self):
+    """Initializes a semantic time that represents never."""
+    super(Never, self).__init__(string='Never')
+
+
+class NotSet(SemanticTime):
+  """Semantic time that represents not set."""
+
+  def __init__(self):
+    """Initializes a semantic time that represents not set."""
+    super(NotSet, self).__init__(string='Not set')
