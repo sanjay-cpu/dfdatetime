@@ -5,6 +5,15 @@ dist: bionic
 jobs:
   include:
   - name: "Fedora 31 (Docker) with Python 3.7"
+    arch: amd64
+    env: FEDORA_VERSION="31"
+    group: edge
+    language: python
+    python: 3.7
+    services:
+    - docker
+  - name: "Fedora 31 (Docker) with Python 3.7"
+    arch: ppc64le
     env: FEDORA_VERSION="31"
     group: edge
     language: python
@@ -12,6 +21,15 @@ jobs:
     services:
     - docker
   - name: "Fedora 32 (Docker) with Python 3.8"
+    arch: amd64
+    env: FEDORA_VERSION="32"
+    group: edge
+    language: python
+    python: 3.8
+    services:
+    - docker
+  - name: "Fedora 32 (Docker) with Python 3.8"
+    arch: ppc64le
     env: FEDORA_VERSION="32"
     group: edge
     language: python
@@ -19,6 +37,15 @@ jobs:
     services:
     - docker
   - name: "Ubuntu Bionic (18.04) (Docker) with Python 3.6"
+    arch: amd64
+    env: UBUNTU_VERSION="18.04"
+    group: edge
+    language: python
+    python: 3.6
+    services:
+    - docker
+  - name: "Ubuntu Bionic (18.04) (Docker) with Python 3.6"
+    arch: ppc64le
     env: UBUNTU_VERSION="18.04"
     group: edge
     language: python
@@ -26,6 +53,15 @@ jobs:
     services:
     - docker
   - name: "Ubuntu Focal (20.04) (Docker) with Python 3.8"
+    arch: amd64
+    env: UBUNTU_VERSION="20.04"
+    group: edge
+    language: python
+    python: 3.8
+    services:
+    - docker
+  - name: "Ubuntu Focal (20.04) (Docker) with Python 3.8"
+    arch: ppc64le
     env: UBUNTU_VERSION="20.04"
     group: edge
     language: python
@@ -33,6 +69,17 @@ jobs:
     services:
     - docker
   - name: "Ubuntu Focal (20.04) (Docker) with Python 3.5 (tox)"
+    arch: amd64
+    env:
+    - TOXENV="py35"
+    - UBUNTU_VERSION="20.04"
+    group: edge
+    language: python
+    python: 3.5
+    services:
+    - docker
+  - name: "Ubuntu Focal (20.04) (Docker) with Python 3.5 (tox)"
+    arch: ppc64le
     env:
     - TOXENV="py35"
     - UBUNTU_VERSION="20.04"
@@ -42,6 +89,17 @@ jobs:
     services:
     - docker
   - name: "Ubuntu Focal (20.04) (Docker) with Python 3.6 (tox)"
+    arch: amd64
+    env:
+    - TOXENV="py36"
+    - UBUNTU_VERSION="20.04"
+    group: edge
+    language: python
+    python: 3.6
+    services:
+    - docker
+  - name: "Ubuntu Focal (20.04) (Docker) with Python 3.6 (tox)"
+    arch: ppc64le
     env:
     - TOXENV="py36"
     - UBUNTU_VERSION="20.04"
@@ -51,6 +109,17 @@ jobs:
     services:
     - docker
   - name: "Ubuntu Focal (20.04) (Docker) with Python 3.7 (tox)"
+    arch: amd64
+    env:
+    - TOXENV="py37"
+    - UBUNTU_VERSION="20.04"
+    group: edge
+    language: python
+    python: 3.7
+    services:
+    - docker
+  - name: "Ubuntu Focal (20.04) (Docker) with Python 3.7 (tox)"
+    arch: ppc64le
     env:
     - TOXENV="py37"
     - UBUNTU_VERSION="20.04"
@@ -60,6 +129,17 @@ jobs:
     services:
     - docker
   - name: "Ubuntu Focal (20.04) (Docker) with Python 3.8 (tox)"
+    arch: amd64
+    env:
+    - TOXENV="py38,coverage,codecov"
+    - UBUNTU_VERSION="20.04"
+    group: edge
+    language: python
+    python: 3.8
+    services:
+    - docker
+  - name: "Ubuntu Focal (20.04) (Docker) with Python 3.8 (tox)"
+    arch: ppc64le
     env:
     - TOXENV="py38,coverage,codecov"
     - UBUNTU_VERSION="20.04"
@@ -69,6 +149,17 @@ jobs:
     services:
     - docker
   - name: "Pylint on Ubuntu Focal (20.04) (Docker) with Python 3.8 (tox)"
+    arch: amd64
+    env:
+    - TOXENV="pylint"
+    - UBUNTU_VERSION="20.04"
+    group: edge
+    language: python
+    python: 3.8
+    services:
+    - docker
+  - name: "Pylint on Ubuntu Focal (20.04) (Docker) with Python 3.8 (tox)"
+    arch: ppc64le
     env:
     - TOXENV="pylint"
     - UBUNTU_VERSION="20.04"
@@ -78,6 +169,17 @@ jobs:
     services:
     - docker
   - name: "Sphinx on Ubuntu Focal (20.04) (Docker) with Python 3.8 (tox)"
+    arch: amd64
+    env:
+    - TOXENV="docs"
+    - UBUNTU_VERSION="20.04"
+    group: edge
+    language: python
+    python: 3.8
+    services:
+    - docker
+  - name: "Sphinx on Ubuntu Focal (20.04) (Docker) with Python 3.8 (tox)"
+    arch: ppc64le
     env:
     - TOXENV="docs"
     - UBUNTU_VERSION="20.04"
