@@ -28,7 +28,7 @@ then
 	docker exec ${CONTAINER_NAME} dnf install -y dnf-plugins-core langpacks-en;
 
 	# Add additional dnf repositories.
-	if [ `uname -m` != "ppc64le" ]; then 
+	if [ $(uname -m) != "ppc64le" ]; then 
 		docker exec ${CONTAINER_NAME} dnf copr -y enable @gift/dev;
         fi
 
